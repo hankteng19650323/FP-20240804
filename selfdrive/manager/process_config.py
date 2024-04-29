@@ -102,6 +102,7 @@ procs = [
 
   # FrogPilot processes
   PythonProcess("fleet_manager", "selfdrive.frogpilot.fleetmanager.fleet_manager", always_run),
+  PythonProcess("thepond", "selfdrive.frogpilot.thepond.thepond", always_run),
   PythonProcess("frogpilot_process", "selfdrive.frogpilot.functions.frogpilot_process", always_run),
   PythonProcess("mapd", "selfdrive.frogpilot.functions.mapd", osm),
 ]
