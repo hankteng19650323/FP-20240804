@@ -290,6 +290,7 @@ def manager_init(frogpilot_functions) -> None:
     ("StandardJerkSpeed", "100"),
     ("StandardPersonalityProfile", "1"),
     ("StandbyMode", "0"),
+    ("StartupAlert", "0"),
     ("StaticPedalsOnUI", "0"),
     ("SteerRatio", ""),
     ("SteerRatioStock", ""),
