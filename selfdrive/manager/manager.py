@@ -237,6 +237,7 @@ def manager_init(frogpilot_functions) -> None:
     ("PromptDistractedVolume", "100"),
     ("QOLControls", "1"),
     ("QOLVisuals", "1"),
+    ("RainbowPath", "0"),
     ("RandomEvents", "0"),
     ("RefuseVolume", "100"),
     ("RelaxedFollow", "1.75"),
