@@ -498,6 +498,13 @@ class Controls:
 
   def state_transition(self, CS):
     """Compute conditional state transitions and execute actions on state transitions"""
+    
+    resume_pressed = any(be.type in (ButtonType.accelCruise, ButtonType.resumeCruise) for be in CS.buttonEvents)
+    set_pressed = any(be.type in (ButtonType.decelCruise, ButtonType.setCruise) for be in CS.buttonEvents)
+    if resume_pressed:
+      self.frogpilot_toggles.prev_button = ButtonType.resumeCruise
+    elif set_pressed:
+      self.frogpilot_toggles.prev_button = ButtonType.setCruise
 
     self.v_cruise_helper.update_v_cruise(CS, self.enabled, self.is_metric, self.speed_limit_changed, self.frogpilot_toggles)
 
@@ -707,8 +714,9 @@ class Controls:
           else:
             steering_value = actuators.steer
 
-          left_deviation = steering_value > 0 and dpath_points[0] < -0.20
-          right_deviation = steering_value < 0 and dpath_points[0] > 0.20
+          # too many steering alert changin lane, reduced dpath_points and added torque check
+          left_deviation = steering_value > 0 and dpath_points[0] < -0.12 and abs(CS.steeringTorqueEps) >= 49
+          right_deviation = steering_value < 0 and dpath_points[0] > 0.12 and abs(CS.steeringTorqueEps) >= 49
 
           if left_deviation or right_deviation:
             self.events.add(EventName.steerSaturated)
@@ -854,6 +862,7 @@ class Controls:
     controlsState.forceDecel = bool(force_decel)
     controlsState.experimentalMode = self.experimental_mode
     controlsState.personality = self.personality
+    self.frogpilot_toggles.experimentalMode = self.experimental_mode
 
     lat_tuning = self.CP.lateralTuning.which()
     if self.joystick_mode:
