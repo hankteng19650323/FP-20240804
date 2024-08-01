@@ -13,7 +13,7 @@ TO_RADIANS = math.pi / 180
 # points should be in radians
 # output is meters
 def distance_to_point(ax, ay, bx, by):
-  a = math.sin((bx - ax) / 2) * math.sin((bx - ax) / 2) + math.cos(ax) * math.cos(bx) * math.sin((by - ay) / 2) * math.sin((by - ay) / 2)
+  a = math.sin((bx - ax) / 2) ** 2 + math.cos(ax) * math.cos(bx) * math.sin((by - ay) / 2) ** 2
   c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
   return R * c  # in meters
 
@@ -125,5 +125,3 @@ class SpeedLimitController:
       return self.max_speed_limit
 
     return 0
-
-SpeedLimitController = SpeedLimitController()
