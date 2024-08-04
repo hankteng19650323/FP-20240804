@@ -213,7 +213,7 @@ class CAR(Platforms):
     CarSpecs(mass=2358, wheelbase=3.11, steerRatio=17.7, centerToFrontRatio=0.4),
   )
   CHEVROLET_TRAILBLAZER_CC = GMPlatformConfig(
-    [GMCarDocs("Chevrolet Trailblazer 2021-22")],
+    [GMCarDocs("Chevrolet Trailblazer 2021-22 - No ACC")],
     CHEVROLET_TRAILBLAZER.specs,
   )
   CADILLAC_XT4 = GMPlatformConfig(
