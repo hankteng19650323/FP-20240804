@@ -89,8 +89,13 @@ class LatControlTorque(LatControl):
 
       # Scaling the lateral acceleration "friction response" could be helpful for some.
       # Increase for a stronger response, decrease for a weaker response.
-      self.lat_jerk_friction_factor = 0.4
-      self.lat_accel_friction_factor = 0.7 # in [0, 3], in 0.05 increments. 3 is arbitrary safety limit
+
+      nnff_lateral_jerk_factor = 1.0 # replace with ---> CI.nnff_lateral_jerk_factor
+      nnff_lateral_jerk_factor = max(0.0, min(1.0, self.nnff_lateral_jerk_factor)) # combine with previous line if you want
+
+      self.lat_jerk_friction_factor = 0.4 * nnff_lateral_jerk_factor
+      # lat_accel_friction_factor is upscaled to account for any decrease in lat_jerk_friction_factor from the default value
+      self.lat_accel_friction_factor = 0.7 + (0.3 * (1.0 - nnff_lateral_jerk_factor)) # in [0, 3], in 0.05 increments. 3 is arbitrary safety limit
 
       # precompute time differences between ModelConstants.T_IDXS
       self.t_diffs = np.diff(ModelConstants.T_IDXS)
@@ -171,7 +176,9 @@ class LatControlTorque(LatControl):
         if self.use_steering_angle or lookahead_lateral_jerk == 0.0:
           lookahead_lateral_jerk = 0.0
           actual_lateral_jerk = 0.0
-          self.lat_accel_friction_factor = 1.0
+          lat_accel_friction_factor = 1.0
+        else:
+          lat_accel_friction_factor = self.lat_accel_friction_factor
         lateral_jerk_setpoint = self.lat_jerk_friction_factor * lookahead_lateral_jerk
         lateral_jerk_measurement = self.lat_jerk_friction_factor * actual_lateral_jerk
 
@@ -214,7 +221,7 @@ class LatControlTorque(LatControl):
 
         # compute feedforward (same as nn setpoint output)
         error = setpoint - measurement
-        friction_input = self.lat_accel_friction_factor * error + self.lat_jerk_friction_factor * lookahead_lateral_jerk
+        friction_input = lat_accel_friction_factor * error + self.lat_jerk_friction_factor * lookahead_lateral_jerk
         nn_input = [CS.vEgo, desired_lateral_accel, friction_input, roll] \
                    + past_lateral_accels_desired + future_planned_lateral_accels \
                    + past_rolls + future_rolls
@@ -234,7 +241,7 @@ class LatControlTorque(LatControl):
         pid_log.error = torque_from_setpoint - torque_from_measurement
         error = desired_lateral_accel - actual_lateral_accel
         if self.use_nnff_lite:
-          friction_input = self.lat_accel_friction_factor * error + self.lat_jerk_friction_factor * lookahead_lateral_jerk
+          friction_input = lat_accel_friction_factor * error + self.lat_jerk_friction_factor * lookahead_lateral_jerk
         else:
           friction_input = error
         ff = self.torque_from_lateral_accel(LatControlInputs(gravity_adjusted_lateral_accel, roll_compensation, CS.vEgo, CS.aEgo), self.torque_params,
