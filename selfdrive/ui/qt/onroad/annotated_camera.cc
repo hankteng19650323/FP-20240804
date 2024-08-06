@@ -887,8 +887,6 @@ void AnnotatedCameraWidget::paintFrogPilotWidgets(QPainter &painter, const UISce
 
   currentAcceleration = scene.acceleration;
 
-  currentRandomEvent = scene.current_random_event;
-
   customColors = scene.custom_colors;
 
   desiredFollow = scene.desired_follow;
@@ -1128,16 +1126,8 @@ void AnnotatedCameraWidget::drawLeadInfo(QPainter &p) {
     isFiveSecondsPassed = false;
   };
 
-  if ((acceleration > maxAcceleration && (status == STATUS_ENGAGED || status == STATUS_TRAFFIC_MODE_ACTIVE)) ||
-      (currentRandomEvent == "accel30" && maxAcceleration < 3.0) ||
-      (currentRandomEvent == "accel35" && maxAcceleration < 3.5) ||
-      (currentRandomEvent == "accel40" && maxAcceleration < 4.0)) {
-    maxAcceleration = std::max({
-      acceleration,
-      currentRandomEvent == "accel30" ? 3.0 : maxAcceleration,
-      currentRandomEvent == "accel35" ? 3.5 : maxAcceleration,
-      currentRandomEvent == "accel40" ? 4.0 : maxAcceleration
-    });
+  if (acceleration > maxAcceleration && (status == STATUS_ENGAGED || status == STATUS_TRAFFIC_MODE_ACTIVE)) {
+    maxAcceleration = acceleration;
     resetTimer();
   } else {
     isFiveSecondsPassed = timer.hasExpired(maxAccelDuration);

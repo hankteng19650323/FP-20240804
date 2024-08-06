@@ -21,9 +21,11 @@ locks = {
   "backup_toggles": threading.Lock(),
   "download_all_models": threading.Lock(),
   "download_model": threading.Lock(),
+  "download_wheel": threading.Lock(),
   "time_checks": threading.Lock(),
   "update_frogpilot_params": threading.Lock(),
-  "update_models": threading.Lock()
+  "update_models": threading.Lock(),
+  "update_themes": threading.Lock()
 }
 
 running_threads = {}
@@ -135,6 +137,10 @@ def frogpilot_thread():
     if params_memory.get_bool("DownloadAllModels"):
       run_thread_with_lock("download_all_models", locks["download_all_models"], download_all_models, (params, params_memory))
 
+    wheel_to_download = params_memory.get("WheelToDownload", encoding='utf-8')
+    if wheel_to_download:
+      run_thread_with_lock("download_wheel", locks["download_wheel"], theme_manager.download_theme, (wheel_to_download, "Steering-Wheels"))
+
     if FrogPilotVariables.toggles_updated:
       update_toggles = True
     elif update_toggles:
@@ -155,6 +161,7 @@ def frogpilot_thread():
       run_time_checks = True
     elif run_time_checks or not time_validated:
       run_thread_with_lock("time_checks", locks["time_checks"], time_checks, (frogpilot_toggles.automatic_updates, deviceState, now, started, params, params_memory))
+      run_thread_with_lock("update_themes", locks["update_themes"], theme_manager.update_themes, ("Steering-Wheels",))
       run_time_checks = False
 
       if not time_validated:
@@ -162,6 +169,7 @@ def frogpilot_thread():
         if not time_validated:
           continue
         run_thread_with_lock("update_models", locks["update_models"], update_models, (params, params_memory))
+        run_thread_with_lock("update_themes", locks["update_themes"], theme_manager.update_themes, ("Steering-Wheels",))
 
       theme_manager.update_holiday()
 

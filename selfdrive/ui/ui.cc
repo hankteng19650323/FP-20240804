@@ -335,6 +335,14 @@ void ui_update_frogpilot_params(UIState *s, Params &params) {
   bool always_on_lateral = params.getBool("AlwaysOnLateral");
   scene.show_aol_status_bar = always_on_lateral && !params.getBool("HideAOLStatusBar");
 
+  bool bonus_content = params.getBool("BonusContent");
+  scene.holiday_themes = bonus_content && params.getBool("HolidayThemes");
+  bool personalize_openpilot = bonus_content && params.getBool("PersonalizeOpenpilot");
+  scene.custom_colors = personalize_openpilot ? params.getInt("CustomColors") : 0;
+  scene.custom_icons = personalize_openpilot ? params.getInt("CustomIcons") : 0;
+  scene.custom_signals = personalize_openpilot ? params.getInt("CustomSignals") : 0;
+  scene.random_events = bonus_content && params.getBool("RandomEvents");
+
   scene.conditional_experimental = scene.longitudinal_control && params.getBool("ConditionalExperimental");
   scene.conditional_speed = scene.conditional_experimental ? params.getInt("CESpeed") : 0;
   scene.conditional_speed_lead = scene.conditional_experimental ? params.getInt("CESpeedLead") : 0;
@@ -354,14 +362,6 @@ void ui_update_frogpilot_params(UIState *s, Params &params) {
   scene.rotating_wheel = custom_onroad_ui && params.getBool("RotatingWheel");
   scene.show_stopping_point = custom_onroad_ui && params.getBool("ShowStoppingPoint");
   scene.show_stopping_point_metrics = scene.show_stopping_point && params.getBool("ShowStoppingPointMetrics");
-  scene.wheel_icon = custom_onroad_ui ? params.getInt("WheelIcon") : 0;
-
-  bool custom_theme = params.getBool("CustomTheme");
-  scene.custom_colors = custom_theme ? params.getInt("CustomColors") : 0;
-  scene.custom_icons = custom_theme ? params.getInt("CustomIcons") : 0;
-  scene.custom_signals = custom_theme ? params.getInt("CustomSignals") : 0;
-  scene.holiday_themes = custom_theme && params.getBool("HolidayThemes");
-  scene.random_events = custom_theme && params.getBool("RandomEvents");
 
   bool developer_ui = params.getBool("DeveloperUI");
   bool border_metrics = developer_ui && params.getBool("BorderMetrics");
@@ -544,7 +544,6 @@ void UIState::update() {
   // FrogPilot variables that need to be constantly updated
   scene.conditional_status = scene.conditional_experimental && scene.enabled ? paramsMemory.getInt("CEStatus") : 0;
   scene.current_holiday_theme = scene.holiday_themes ? paramsMemory.getInt("CurrentHolidayTheme") : 0;
-  scene.current_random_event = scene.random_events ? QString::fromStdString(paramsMemory.get("CurrentRandomEvent")) : "";
   scene.driver_camera_timer = scene.driver_camera && scene.reverse ? scene.driver_camera_timer + 1 : 0;
   scene.force_onroad = paramsMemory.getBool("ForceOnroad");
   scene.started_timer = scene.started || started_prev ? scene.started_timer + 1 : 0;

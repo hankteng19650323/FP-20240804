@@ -9,7 +9,7 @@ from openpilot.common.params import Params
 from openpilot.selfdrive.controls.lib.desire_helper import LANE_CHANGE_SPEED_MIN
 from openpilot.system.version import get_build_metadata
 
-from openpilot.selfdrive.frogpilot.controls.lib.frogpilot_functions import MODELS_PATH
+from openpilot.selfdrive.frogpilot.controls.lib.frogpilot_functions import MODELS_PATH, update_wheel_image
 from openpilot.selfdrive.frogpilot.controls.lib.model_manager import DEFAULT_MODEL, DEFAULT_MODEL_NAME, process_model_name
 
 CITY_SPEED_LIMIT = 25  # 55mph is typically the minimum speed for highways
@@ -25,6 +25,8 @@ class FrogPilotVariables:
 
     self.has_prime = self.params.get_int("PrimeType") > 0
     self.release = get_build_metadata().release_channel
+
+    self.previous_wheel_image = "img_chffr_wheel"
 
     self.update_frogpilot_params(False)
 
@@ -76,6 +78,18 @@ class FrogPilotVariables:
 
     toggle.automatic_updates = self.params.get_bool("AutomaticUpdates")
 
+    bonus_content = self.params.get_bool("BonusContent")
+    holiday_themes = bonus_content and self.params.get_bool("HolidayThemes")
+    personalize_openpilot = bonus_content and self.params.get_bool("PersonalizeOpenpilot")
+    toggle.custom_sounds = self.params.get_int("CustomSounds") if personalize_openpilot else 0
+    toggle.current_holiday_theme = self.params_memory.get_int("CurrentHolidayTheme") if holiday_themes else 0
+    toggle.goat_scream = bonus_content and self.params.get_bool("GoatScream")
+    toggle.wheel_image = self.params.get("WheelIcon", encoding='utf-8') if personalize_openpilot else "img_chffr_wheel"
+    if toggle.wheel_image != self.previous_wheel_image:
+      update_wheel_image(toggle.wheel_image, self.params_memory, False, False)
+      self.previous_wheel_image = toggle.wheel_image
+    toggle.random_events = bonus_content and self.params.get_bool("RandomEvents")
+
     toggle.cluster_offset = self.params.get_float("ClusterOffset") if car_make == "toyota" else 1
 
     toggle.conditional_experimental_mode = openpilot_longitudinal and self.params.get_bool("ConditionalExperimental")
@@ -98,13 +112,6 @@ class FrogPilotVariables:
     toggle.green_light_alert = custom_alerts and self.params.get_bool("GreenLightAlert")
     toggle.lead_departing_alert = custom_alerts and self.params.get_bool("LeadDepartingAlert")
     toggle.loud_blindspot_alert = custom_alerts and self.params.get_bool("LoudBlindspotAlert")
-
-    custom_themes = self.params.get_bool("CustomTheme")
-    holiday_themes = custom_themes and self.params.get_bool("HolidayThemes")
-    toggle.current_holiday_theme = self.params_memory.get_int("CurrentHolidayTheme") if holiday_themes else 0
-    toggle.custom_sounds = self.params.get_int("CustomSounds") if custom_themes else 0
-    toggle.goat_scream = toggle.current_holiday_theme == 0 and toggle.custom_sounds == 1 and self.params.get_bool("GoatScream")
-    toggle.random_events = custom_themes and self.params.get_bool("RandomEvents")
 
     custom_ui = self.params.get_bool("CustomUI")
     custom_paths = custom_ui and self.params.get_bool("CustomPaths")

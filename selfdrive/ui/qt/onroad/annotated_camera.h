@@ -165,7 +165,6 @@ private:
   QPixmap stopSignImg;
 
   QString accelerationUnit;
-  QString currentRandomEvent;
   QString leadDistanceUnit;
   QString leadSpeedUnit;
 
