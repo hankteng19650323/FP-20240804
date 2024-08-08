@@ -198,7 +198,7 @@ def update_frogpilot_toggles():
     params_memory.put_bool("FrogPilotTogglesUpdated", False)
   threading.Thread(target=update_params).start()
 
-def update_wheel_image(image, params_memory, holiday_theme=False, random_event=True):
+def update_wheel_image(image, holiday_theme=False, random_event=True):
   if holiday_theme:
     wheel_locations = f"{BASEDIR}/selfdrive/frogpilot/assets/holiday_themes/{image}/images/steering_wheel"
   elif random_event:
@@ -229,8 +229,6 @@ def update_wheel_image(image, params_memory, holiday_theme=False, random_event=T
     destination_file = os.path.join(wheel_save_location, f"wheel{file_extension}")
     shutil.copy2(source_file, destination_file)
     print(f"Copied {source_file} to {destination_file}")
-
-  params_memory.put_bool("UpdateWheelImage", True)
 
 class MovingAverageCalculator:
   def __init__(self):

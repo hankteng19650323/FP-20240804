@@ -86,7 +86,7 @@ class FrogPilotVariables:
     toggle.goat_scream = bonus_content and self.params.get_bool("GoatScream")
     toggle.wheel_image = self.params.get("WheelIcon", encoding='utf-8') if personalize_openpilot else "img_chffr_wheel"
     if toggle.wheel_image != self.previous_wheel_image:
-      update_wheel_image(toggle.wheel_image, self.params_memory, False, False)
+      update_wheel_image(toggle.wheel_image, False, False)
       self.previous_wheel_image = toggle.wheel_image
     toggle.random_events = bonus_content and self.params.get_bool("RandomEvents")
 

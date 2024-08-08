@@ -69,7 +69,7 @@ class ThemeManager:
       if holiday.endswith("_week") and self.is_within_week_of(date, current_date) or current_date.date() == date.date():
         if theme_id != self.previous_theme_id:
           self.params_memory.put_int("CurrentHolidayTheme", theme_id)
-          update_wheel_image(theme_id, self.params_memory, True, False)
+          update_wheel_image(theme_id, True, False)
           update_frogpilot_toggles()
         self.previous_theme_id = theme_id
         return
