@@ -29,10 +29,10 @@ def cleanup_backups(directory, limit):
     subprocess.run(["sudo", "rm", "-rf", old_backup], check=True)
     print(f"Deleted oldest backup: {os.path.basename(old_backup)}")
 
-def backup_directory(backup, destination, success_msg, fail_msg):
+def backup_directory(backup, destination, success_message, fail_message):
   os.makedirs(destination, exist_ok=True)
   try:
-    run_cmd(['sudo', 'cp', '-a', os.path.join(backup, '.'), destination], success_msg, fail_msg)
+    run_cmd(["sudo", "rsync", "-avq", "--exclude", ".*", os.path.join(backup, ""), destination], success_message, fail_message)
   except OSError as e:
     if e.errno == 28:
       print("Not enough space to perform the backup.")
@@ -133,12 +133,12 @@ def is_url_pingable(url, timeout=5):
   except (http.client.IncompleteRead, http.client.RemoteDisconnected, socket.gaierror, socket.timeout, urllib.error.HTTPError, urllib.error.URLError):
     return False
 
-def run_cmd(cmd, success_msg, fail_msg):
+def run_cmd(cmd, success_message, fail_message):
   try:
     subprocess.check_call(cmd)
-    print(success_msg)
+    print(success_message)
   except subprocess.CalledProcessError as e:
-    print(f"{fail_msg}: {e}")
+    print(f"{fail_message}: {e}")
   except Exception as e:
     print(f"Unexpected error occurred: {e}")
 
@@ -173,7 +173,7 @@ def setup_frogpilot(build_metadata):
     print("Successfully saved original_bg.jpg.")
 
   if filecmp.cmp(boot_logo_save_location, frogpilot_boot_logo_jpg, shallow=False):
-    os.remove(boot_logo_save_location)
+    delete_file(boot_logo_save_location)
 
   if not filecmp.cmp(frogpilot_boot_logo, boot_logo_location, shallow=False):
     run_cmd(["sudo", "cp", frogpilot_boot_logo, boot_logo_location], "Successfully replaced bg.jpg with frogpilot_boot_logo.png.", "Failed to replace boot logo.")
@@ -213,16 +213,13 @@ def update_wheel_image(image, holiday_theme=False, random_event=True):
   for filename in os.listdir(wheel_save_location):
     if filename.startswith("wheel"):
       file_path = os.path.join(wheel_save_location, filename)
-      os.remove(file_path)
+      delete_file(file_path)
 
   source_file = None
   for filename in os.listdir(wheel_locations):
     if os.path.splitext(filename)[0].lower() == image.replace(" ", "_").lower():
       source_file = os.path.join(wheel_locations, filename)
       break
-
-  if not source_file:
-    return
 
   if source_file and os.path.exists(source_file):
     file_extension = os.path.splitext(source_file)[1]

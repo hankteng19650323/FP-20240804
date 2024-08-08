@@ -140,7 +140,7 @@ class FrogPilotEvents:
         self.fcw_played = True
         self.random_event_played = True
 
-    if frogpilot_toggles.speed_limit_alert and self.speed_limit_changed:
+    if frogpilot_toggles.speed_limit_alert and self.frogpilot_planner.frogpilot_vcruise.speed_limit_changed:
       self.events.add(EventName.speedLimitChanged)
 
     if self.frame == 4 and self.params.get("NNFFModelName", encoding='utf-8') is not None:

@@ -111,7 +111,7 @@ void update_model(UIState *s,
 
   // Update adjacent paths
   for (int i = 4; i <= 5; i++) {
-    update_line_data(s, lane_lines[i], (i == 4 ? scene.lane_width_left : scene.lane_width_right) / 2.0f, -0.6, &scene.track_adjacent_vertices[i], max_idx, false);
+    update_line_data(s, lane_lines[i], (i == 4 ? scene.lane_width_left : scene.lane_width_right) / 2.0f, 0, &scene.track_adjacent_vertices[i], max_idx, false);
   }
 
   // update path
